@@ -5,22 +5,27 @@ function App() {
   const [playerType, setPlayerType] = React.useState<null | "triton" | "audio">(
     null
   );
+  const [streamingUrl, setStreamingUrl] = React.useState("");
   return (
     <div className="App">
       <h1>Playground app</h1>
 
       <button
         onClick={async () => {
-          emitter.emit("play_triton_player", "VERONICA");
+          const url = "VERONICA";
           setPlayerType("triton");
+          emitter.emit("play_triton_player", url);
+          setStreamingUrl(url);
         }}
       >
         Play VERONICA (triton player)
       </button>
       <button
         onClick={async () => {
-          emitter.emit("play_triton_player", "RADIO538");
+          const url = "RADIO538";
           setPlayerType("triton");
+          emitter.emit("play_triton_player", url);
+          setStreamingUrl(url);
         }}
       >
         Play RADIO538 (triton player)
@@ -29,11 +34,11 @@ function App() {
       <button
         style={{ border: "3px solid green" }}
         onClick={async () => {
-          emitter.emit(
-            "play_audio_player",
-            "https://icecast-qmusicnl-cdp.triple-it.nl/Qmusic_nl_live.mp3?aw_0_1st.playerId=Juke"
-          );
           setPlayerType("audio");
+          const url =
+            "https://icecast-qmusicnl-cdp.triple-it.nl/Qmusic_nl_live.mp3?aw_0_1st.playerId=Juke";
+          emitter.emit("play_audio_player", url);
+          setStreamingUrl(url);
         }}
       >
         Play QMUSIC (Audio player)
@@ -41,14 +46,19 @@ function App() {
 
       <button
         onClick={async () => {
-          emitter.emit("play_triton_player", "TLPNET01");
+          const url = "TLPNET01";
+          emitter.emit("play_triton_player", url);
           setPlayerType("triton");
+          setStreamingUrl(url);
         }}
       >
         Play RADIO 10 (triton player)
       </button>
 
       <PlayerManager playerType={playerType} />
+      <p>
+        Playing... {playerType || "nothing"} url: {streamingUrl || "no URL"}
+      </p>
     </div>
   );
 }

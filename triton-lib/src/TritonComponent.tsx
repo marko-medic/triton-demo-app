@@ -4,9 +4,8 @@ import * as React from 'react';
 
 import { emitter } from './shared';
 
-import { WithPlayerType } from './types';
-
 import loadScript from 'load-script';
+import { WithPlayerType } from './types';
 
 function getGlobal(key) {
   if (window[key]) {
@@ -67,17 +66,31 @@ const SDK_GLOBAL = 'TDSdk';
 
 const config = { streamUrl: 'VERONICA' };
 
-export const TritonComponent: React.FC<WithPlayerType> = ({}) => {
+export const TritonComponent: React.FC<WithPlayerType> = ({ playerType }) => {
   const playerRef = React.useRef(null);
   const [isReady, setIsReady] = React.useState(false);
 
   React.useEffect(() => {
     emitter.on('play_triton_player', loadAndPlay);
-
     return () => {
       emitter.off('play_triton_player', loadAndPlay);
     };
   }, []);
+
+  React.useEffect(() => {
+    return () => {
+      if (playerType !== 'triton') {
+        playerRef.current?.destroy();
+        playerRef.current = null;
+      }
+    };
+  }, [playerType]);
+
+  React.useEffect(() => {
+    if (playerType !== 'triton') {
+      playerRef.current?.stop();
+    }
+  }, [playerType]);
 
   const onPlayerReady = resolve => {
     setIsReady(true);
@@ -166,11 +179,11 @@ export const TritonComponent: React.FC<WithPlayerType> = ({}) => {
     });
   };
 
-  async function loadAndPlay(station) {
+  async function loadAndPlay(station: string) {
+    playerRef.current?.stop();
     config.streamUrl = station;
     await load();
     playerRef.current?.play({ mount: station });
-    console.log('@@start play', station);
   }
 
   return <div className="my-triton-app"></div>;

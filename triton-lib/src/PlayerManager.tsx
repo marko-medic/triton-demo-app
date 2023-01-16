@@ -5,9 +5,9 @@ import { WithPlayerType } from './types';
 
 export const PlayerManager: React.FC<WithPlayerType> = ({ playerType }) => {
   return (
-    <div>
-      <AudioPlayerComponent playerType={playerType} />
+    <>
       <TritonComponent playerType={playerType} />
-    </div>
+      <AudioPlayerComponent playerType={playerType} />
+    </>
   );
 };

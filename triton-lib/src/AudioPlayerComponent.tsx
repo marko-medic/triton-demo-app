@@ -3,7 +3,9 @@ import ReactAudioPlayer from 'react-audio-player';
 import { emitter } from './shared';
 import { WithPlayerType } from './types';
 
-export const AudioPlayerComponent: React.FC<WithPlayerType> = ({}) => {
+export const AudioPlayerComponent: React.FC<WithPlayerType> = ({
+  playerType,
+}) => {
   const playerRef = React.useRef<ReactAudioPlayer>(null);
   const [streamUrl, setStreamUrl] = React.useState('');
 
@@ -19,18 +21,46 @@ export const AudioPlayerComponent: React.FC<WithPlayerType> = ({}) => {
     };
   }, []);
 
-  React.useEffect(() => {
-    const playerNode = getPlayerNode();
-    if (streamUrl && playerNode) {
-      playerNode.src = playerNode.src;
-      playerNode.load();
-      const playPromise = playerNode.play();
-      console.log('@@start play', streamUrl);
-
-      window.Promise.resolve(playPromise).catch(error => {
-        console.log('@error when playing audio', error);
-      });
+  const handleStop = () => {
+    const audio = getPlayerNode();
+    if (!audio) {
+      return;
     }
+    audio.pause();
+    audio.currentTime = 0;
+    // eslint-disable-next-line no-self-assign
+    audio.src = audio.src;
+    setStreamUrl('');
+  };
+
+  const handlePlay = (url: string) => {
+    handleStop();
+    setStreamUrl(url);
+
+    const audio = getPlayerNode();
+    if (!audio) {
+      return;
+    }
+    // eslint-disable-next-line no-self-assign
+    audio.src = streamUrl;
+    audio.load();
+    console.log('@@Play', url);
+
+    const playPromise = audio.play();
+    window.Promise.resolve(playPromise);
+  };
+
+  React.useEffect(() => {
+    if (playerType !== 'audio') {
+      handleStop();
+    }
+  }, [playerType]);
+
+  React.useEffect(() => {
+    if (!streamUrl) {
+      return;
+    }
+    handlePlay(streamUrl);
   }, [streamUrl]);
 
   return (
