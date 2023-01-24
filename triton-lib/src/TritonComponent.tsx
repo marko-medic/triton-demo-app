@@ -80,16 +80,11 @@ export const TritonComponent: React.FC<WithPlayerType> = ({ playerType }) => {
   React.useEffect(() => {
     return () => {
       if (playerType !== 'triton') {
+        playerRef.current?.stop();
         playerRef.current?.destroy();
         playerRef.current = null;
       }
     };
-  }, [playerType]);
-
-  React.useEffect(() => {
-    if (playerType !== 'triton') {
-      playerRef.current?.stop();
-    }
   }, [playerType]);
 
   const onPlayerReady = resolve => {
